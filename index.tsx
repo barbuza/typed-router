@@ -1,38 +1,37 @@
-import * as React from "react";
+import * as React from 'react';
 import { IMatcher } from "ts-url-pattern";
 
-export interface IRouteProps<T = object, E = object> {
-  readonly url: IMatcher<T>;
-  readonly component: React.ComponentClass<T & E> | React.SFC<T>;
-  readonly extra?: E;
-}
+export type IRoute = (url: string) => JSX.Element | undefined;
 
-export function Route<T = object>(props: IRouteProps<T>): React.SFCElement<IRouteProps<T>> {
-  // tslint:disable-next-line
-  !!props;
-  throw new Error("Route must be direct child of Router");
+export function route<M, P extends object>(matcher: IMatcher<M>, params: P, factory: (args: M & P) => JSX.Element): (url: string) => JSX.Element | undefined {
+  return (url: string) => {
+    const match = matcher.match(url);
+    if (match) {
+      const result = {} as M & P;
+      for (const key of Object.keys(params)) {
+        result[key] = params[key];
+      }
+      for (const key of Object.keys(match)) {
+        result[key] = match[key];
+      }
+      return factory(result);
+    }
+    return undefined;
+  }
 }
 
 export interface IRouterProps {
   readonly url: string;
-  readonly children: Array<React.ReactElement<IRouteProps>>;
-  readonly notFound: React.ComponentClass<never> | React.SFC<never>;
+  readonly children: Array<IRoute>;
+  readonly notFound: () => JSX.Element;
 }
 
 export const Router: React.SFC<IRouterProps> = (props) => {
-  let route: JSX.Element | undefined;
   for (const child of props.children) {
-    if (child.type !== Route) {
-      throw new Error("all Router children must be Route elements");
-    }
-    const args = child.props.url.match(props.url);
-    if (args) {
-      route = <child.props.component {...child.props.extra} {...args} />;
-      break;
+    const route = child(props.url);
+    if (route) {
+      return route;
     }
   }
-  if (!route) {
-    return <props.notFound />;
-  }
-  return route;
+  return props.notFound();
 };

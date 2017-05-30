@@ -1,11 +1,11 @@
-import { shallow } from "enzyme";
+import { mount } from "enzyme";
 import * as React from "react";
 import { builder } from "ts-url-pattern";
-import { Route, Router } from "./index";
+import { route, Router } from "./index";
 
 class NumPage extends React.PureComponent<{ spam: number, eggs: number }, never> {
   public render() {
-    return <div>num: {this.props.spam}</div>;
+    return <div>num: {this.props.spam} extra: {this.props.eggs}</div>;
   }
 }
 
@@ -13,43 +13,26 @@ const StrPage: React.SFC<{ bar: string }> = (props) => {
   return <div>str: {props.bar}</div>;
 };
 
-function NotFound() {
+const NotFound: React.SFC<never> = () => {
   return <div>not found</div>;
-}
+};
 
 describe("Router", () => {
-  it("shouldnt", () => {
-    expect(() => {
-      shallow(<Route url={builder} component={NotFound} />);
-    }).toThrow(/direct child/);
-
-    expect(() => {
-      shallow(
-        <Router url="/" notFound={NotFound}>
-          <div />
-          <div />
-        </Router>,
-      );
-    }).toThrow(/Router children/);
-  });
-
   it("should", () => {
     const numRoute = builder.raw("foo").num("spam");
     const strRoute = builder.raw("foo").str("bar");
 
     function router(url: string) {
       return (
-        <Router url={url} notFound={NotFound}>
-          <Route url={numRoute} component={NumPage} extra={{ eggs: 20 }} />
-          <Route url={strRoute} component={StrPage} />
-        </Router>
+        <Router url={url} notFound={React.createFactory(NotFound)}>{[
+          route(numRoute, { eggs: 20 }, React.createFactory(NumPage)),
+          route(strRoute, {}, React.createFactory(StrPage))
+        ]}</Router>
       );
     }
 
-    expect(shallow(router("/")).find(NotFound).exists()).toBe(true);
-    expect(shallow(router("/foo/string")).find(StrPage).exists()).toBe(true);
-    expect(shallow(router("/foo/string")).find(StrPage).props()).toEqual({ bar: "string" });
-    expect(shallow(router("/foo/10")).find(NumPage).exists()).toBe(true);
-    expect(shallow(router("/foo/10")).find(NumPage).props()).toEqual({ spam: 10, eggs: 20 });
+    expect(mount(router('/')).text()).toBe('not found');
+    expect(mount(router('/foo/string')).text()).toBe('str: string');
+    expect(mount(router('/foo/10')).text()).toBe('num: 10 extra: 20');
   });
 });
