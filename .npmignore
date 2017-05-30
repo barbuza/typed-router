@@ -1,6 +1,6 @@
 /.travis.yml
 /.editorconfig
-/index.tsx
+/index.ts
 /index-test*
 /tsconfig.json
 /tslint.json
