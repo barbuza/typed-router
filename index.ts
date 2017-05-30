@@ -1,13 +1,17 @@
-import * as React from 'react';
+import * as React from "react";
 import { IMatcher } from "ts-url-pattern";
 
 export type IRoute = (url: string) => JSX.Element | undefined;
 
-export function route<M, P extends object>(matcher: IMatcher<M>, params: P, factory: (args: M & P) => JSX.Element): (url: string) => JSX.Element | undefined {
+export function route<M, P extends object>(
+  matcher: IMatcher<M>,
+  params: P,
+  factory: (args: M & P) => JSX.Element,
+): IRoute {
   return (url: string) => {
     const match = matcher.match(url);
     if (match) {
-      const result = {} as M & P;
+      const result: M & P = {} as any;
       for (const key of Object.keys(params)) {
         result[key] = params[key];
       }
@@ -17,12 +21,12 @@ export function route<M, P extends object>(matcher: IMatcher<M>, params: P, fact
       return factory(result);
     }
     return undefined;
-  }
+  };
 }
 
 export interface IRouterProps {
   readonly url: string;
-  readonly children: Array<IRoute>;
+  readonly children: IRoute[];
   readonly notFound: () => JSX.Element;
 }
 

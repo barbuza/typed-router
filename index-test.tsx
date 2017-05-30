@@ -26,13 +26,13 @@ describe("Router", () => {
       return (
         <Router url={url} notFound={React.createFactory(NotFound)}>{[
           route(numRoute, { eggs: 20 }, React.createFactory(NumPage)),
-          route(strRoute, {}, React.createFactory(StrPage))
+          route(strRoute, {}, React.createFactory(StrPage)),
         ]}</Router>
       );
     }
 
-    expect(mount(router('/')).text()).toBe('not found');
-    expect(mount(router('/foo/string')).text()).toBe('str: string');
-    expect(mount(router('/foo/10')).text()).toBe('num: 10 extra: 20');
+    expect(mount(router("/")).text()).toBe("not found");
+    expect(mount(router("/foo/string")).text()).toBe("str: string");
+    expect(mount(router("/foo/10")).text()).toBe("num: 10 extra: 20");
   });
 });
