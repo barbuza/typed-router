@@ -1,9 +1,10 @@
 import * as React from "react";
 import { IMatcher } from "ts-url-pattern";
 
-export interface IRouteProps<T = object> {
+export interface IRouteProps<T = object, E = object> {
   readonly url: IMatcher<T>;
-  readonly component: React.ComponentClass<T> | React.SFC<T>;
+  readonly component: React.ComponentClass<T & E> | React.SFC<T>;
+  readonly extra?: E;
 }
 
 export function Route<T = object>(props: IRouteProps<T>): React.SFCElement<IRouteProps<T>> {
@@ -26,7 +27,7 @@ export const Router: React.SFC<IRouterProps> = (props) => {
     }
     const args = child.props.url.match(props.url);
     if (args) {
-      route = <child.props.component {...args} />;
+      route = <child.props.component {...child.props.extra} {...args} />;
       break;
     }
   }

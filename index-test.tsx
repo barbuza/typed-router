@@ -3,7 +3,7 @@ import * as React from "react";
 import { builder } from "ts-url-pattern";
 import { Route, Router } from "./index";
 
-class NumPage extends React.PureComponent<{ spam: number }, never> {
+class NumPage extends React.PureComponent<{ spam: number, eggs: number }, never> {
   public render() {
     return <div>num: {this.props.spam}</div>;
   }
@@ -40,7 +40,7 @@ describe("Router", () => {
     function router(url: string) {
       return (
         <Router url={url} notFound={NotFound}>
-          <Route url={numRoute} component={NumPage} />
+          <Route url={numRoute} component={NumPage} extra={{ eggs: 20 }} />
           <Route url={strRoute} component={StrPage} />
         </Router>
       );
@@ -50,6 +50,6 @@ describe("Router", () => {
     expect(shallow(router("/foo/string")).find(StrPage).exists()).toBe(true);
     expect(shallow(router("/foo/string")).find(StrPage).props()).toEqual({ bar: "string" });
     expect(shallow(router("/foo/10")).find(NumPage).exists()).toBe(true);
-    expect(shallow(router("/foo/10")).find(NumPage).props()).toEqual({ spam: 10 });
+    expect(shallow(router("/foo/10")).find(NumPage).props()).toEqual({ spam: 10, eggs: 20 });
   });
 });
