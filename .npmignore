@@ -1,0 +1,9 @@
+/.travis.yml
+/.editorconfig
+/index.tsx
+/index-test*
+/tsconfig.json
+/tslint.json
+/yarn.lock
+/coverage
+/.npmignore

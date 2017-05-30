@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es3",
+    "jsx": "react",
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "noImplicitReturns": true,
+    "strict": true,
+    "experimentalDecorators": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "declaration": true
+  }
+}
